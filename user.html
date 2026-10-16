@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VYBE | User Login</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #101018;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .login-box {
+      width: min(100%, 420px);
+      padding: 32px;
+      background: #1c1c29;
+      border: 1px solid #373747;
+      border-radius: 18px;
+    }
+    h1 { text-align: center; color: #a78bfa; }
+    .subtitle { text-align: center; color: #b8b8c8; }
+    label { display: block; margin: 16px 0 8px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #454557;
+      border-radius: 8px;
+      background: #101018;
+      color: white;
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #7040df; }
+    .switch {
+      background: transparent;
+      border: 1px solid #8b5cf6;
+      margin-top: 12px;
+    }
+    .switch:hover { background: #302448; }
+    #message { text-align: center; margin-top: 16px; }
+    a { color: #c4b5fd; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="login-box">
+    <h1>VYBE</h1>
+    <p class="subtitle" id="subtitle">Welcome back! Sign in to continue.</p>
+
+    <form id="authForm">
+      <div id="nameGroup" class="hidden">
+        <label for="name">Full Name</label>
+        <input id="name" type="text" placeholder="Enter your name">
+      </div>
+
+      <label for="email">Email</label>
+      <input id="email" type="email"
+             placeholder="Enter your email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+             placeholder="Enter your password" minlength="6" required>
+
+      <button type="submit" id="submitButton">Login</button>
+    </form>
+
+    <button type="button" class="switch" id="switchButton">
+      Create a new account
+    </button>
+
+    <p id="message" role="status"></p>
+    <p style="text-align:center">
+      <a href="index.html">Back to Home</a>
+    </p>
+  </main>
+
+  <script>
+    const form = document.getElementById("authForm");
+    const nameGroup = document.getElementById("nameGroup");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const submitButton = document.getElementById("submitButton");
+    const switchButton = document.getElementById("switchButton");
+    const subtitle = document.getElementById("subtitle");
+    const message = document.getElementById("message");
+
+    let isRegistering = false;
+
+    function getUsers() {
+      return JSON.parse(localStorage.getItem("vybeUsers") || "[]");
+    }
+
+    switchButton.addEventListener("click", function() {
+      isRegistering = !isRegistering;
+
+      nameGroup.classList.toggle("hidden", !isRegistering);
+      nameInput.required = isRegistering;
+
+      submitButton.textContent = isRegistering
+        ? "Create Account" : "Login";
+
+      switchButton.textContent = isRegistering
+        ? "Already have an account? Login"
+        : "Create a new account";
+
+      subtitle.textContent = isRegistering
+        ? "Join VYBE today."
+        : "Welcome back! Sign in to continue.";
+
+      message.textContent = "";
+    });
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const email = emailInput.value.trim().toLowerCase();
+      const password = passwordInput.value;
+      const users = getUsers();
+
+      if (isRegistering) {
+        const name = nameInput.value.trim();
+
+        if (!name) {
+          message.textContent = "Please enter your name.";
+          return;
+        }
+
+        if (email === "admin@vybe.com") {
+          message.textContent = "This email is reserved for admin.";
+          return;
+        }
+
+        if (users.some(user => user.email === email)) {
+          message.textContent = "Account already exists. Please log in.";
+          return;
+        }
+
+        users.push({ name, email, password });
+
+        localStorage.setItem("vybeUsers", JSON.stringify(users));
+
+        message.textContent = "Registration successful! You can now log in.";
+        message.style.color = "#86efac";
+
+        isRegistering = false;
+        nameGroup.classList.add("hidden");
+        nameInput.required = false;
+        form.reset();
+
+        submitButton.textContent = "Login";
+        switchButton.textContent = "Create a new account";
+        subtitle.textContent = "Welcome back! Sign in to continue.";
+      } else {
+        const user = users.find(
+          item => item.email === email && item.password === password
+        );
+
+        if (!user) {
+          message.textContent = "Invalid email or password.";
+          message.style.color = "#fca5a5";
+          return;
+        }
+
+        localStorage.setItem("vybeCurrentUser", JSON.stringify({
+          name: user.name,
+          email: user.email,
+          role: "user"
+        }));
+
+        message.textContent = "Login successful! Welcome, " + user.name + ".";
+        message.style.color = "#86efac";
+
+        // Change this to your actual user dashboard when available.
+        // Example: window.location.href = "user-dashboard.html";
+      }
+    });
+  </script>
+</body>
+</html>
+

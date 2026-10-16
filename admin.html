@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VYBE | Admin Login</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #101018;
+      color: white;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .login-box {
+      width: min(100%, 400px);
+      background: #1c1c29;
+      padding: 32px;
+      border: 1px solid #373747;
+      border-radius: 18px;
+    }
+    h1 { color: #a78bfa; text-align: center; }
+    p { color: #b8b8c8; text-align: center; }
+    label { display: block; margin: 18px 0 8px; }
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #454557;
+      border-radius: 8px;
+      background: #101018;
+      color: white;
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 22px;
+      border: none;
+      border-radius: 8px;
+      background: #8b5cf6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #7040df; }
+    #message { margin-top: 18px; }
+    a { color: #c4b5fd; }
+  </style>
+</head>
+<body>
+  <main class="login-box">
+    <h1>VYBE Admin</h1>
+    <p>Sign in to manage VYBE.</p>
+
+    <form id="adminForm">
+      <label for="email">Admin Email</label>
+      <input id="email" type="email"
+             placeholder="Enter admin email" required>
+
+      <label for="password">Password</label>
+      <input id="password" type="password"
+             placeholder="Enter password" required>
+
+      <button type="submit">Login as Admin</button>
+    </form>
+
+    <p id="message" role="status"></p>
+    <p><a href="index.html">Back to Home</a></p>
+  </main>
+
+  <script>
+    const ADMIN_EMAIL = "admin@vybe.com";
+    const ADMIN_PASSWORD = "admin123";
+
+    document.getElementById("adminForm").addEventListener(
+      "submit", function(event) {
+        event.preventDefault();
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+        const message = document.getElementById("message");
+
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+          localStorage.setItem("vybeCurrentUser", JSON.stringify({
+            email: ADMIN_EMAIL,
+            role: "admin"
+          }));
+
+          message.textContent = "Admin login successful!";
+          message.style.color = "#86efac";
+
+          // Change this to your admin dashboard page when available.
+          // Example: window.location.href = "admin-dashboard.html";
+        } else {
+          message.textContent = "Invalid admin email or password.";
+          message.style.color = "#fca5a5";
+        }
+      }
+    );
+  </script>
+</body>
+</html>
